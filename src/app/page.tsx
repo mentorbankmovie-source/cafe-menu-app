@@ -53,14 +53,14 @@ const initialMenuData: MenuItem[] = [
   { id: 12, category: "디저트", name: "아몬드 청키초코 르뱅쿠키", image: "/menu/almond-chunky-levain.png", price: 5000, hotQty: 0, iceQty: 0, hasTempOption: false },
   { id: 13, category: "디저트", name: "두바이 쫀득쿠키", image: "/menu/dubai-cookie.png", price: 5500, hotQty: 0, iceQty: 0, hasTempOption: false },
   // 음료 (Hot/Ice 선택 가능)
-  { id: 14, category: "음료", name: "아메리카노", image: "", price: 3800, hotQty: 0, iceQty: 0, hasTempOption: true },
-  { id: 15, category: "음료", name: "카페라떼", image: "", price: 4500, hotQty: 0, iceQty: 0, hasTempOption: true },
-  { id: 16, category: "음료", name: "무설탕 초코라떼", image: "", price: 5000, hotQty: 0, iceQty: 0, hasTempOption: true },
-  { id: 17, category: "음료", name: "말차라떼", image: "", price: 5000, hotQty: 0, iceQty: 0, hasTempOption: true },
-  { id: 18, category: "음료", name: "복숭아 아이스티", image: "", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
-  { id: 19, category: "음료", name: "매실 아이스티", image: "", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
-  { id: 20, category: "음료", name: "페퍼민트", image: "", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
-  { id: 21, category: "음료", name: "캐모마일", image: "", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 14, category: "음료", name: "아메리카노", image: "/menu/americano.png", price: 3800, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 15, category: "음료", name: "카페라떼", image: "/menu/cafe-latte.png", price: 4500, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 16, category: "음료", name: "무설탕 초코라떼", image: "/menu/choco-latte.png", price: 5000, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 17, category: "음료", name: "말차라떼", image: "/menu/matcha-latte.png", price: 5000, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 18, category: "음료", name: "복숭아 아이스티", image: "/menu/peach-icetea.png", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 19, category: "음료", name: "매실 아이스티", image: "/menu/plum-icetea.png", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 20, category: "음료", name: "페퍼민트", image: "/menu/peppermint.png", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 21, category: "음료", name: "캐모마일", image: "/menu/chamomile.png", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
 ];
 
 // ──────────────────────────────────────────────
