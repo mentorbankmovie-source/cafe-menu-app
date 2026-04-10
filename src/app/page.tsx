@@ -57,8 +57,8 @@ const initialMenuData: MenuItem[] = [
   { id: 15, category: "음료", name: "카페라떼", image: "", price: 4500, hotQty: 0, iceQty: 0, hasTempOption: true },
   { id: 16, category: "음료", name: "무설탕 초코라떼", image: "", price: 5000, hotQty: 0, iceQty: 0, hasTempOption: true },
   { id: 17, category: "음료", name: "말차라떼", image: "", price: 5000, hotQty: 0, iceQty: 0, hasTempOption: true },
-  { id: 18, category: "음료", name: "복숭아 아이스티", image: "", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: false },
-  { id: 19, category: "음료", name: "매실 아이스티", image: "", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: false },
+  { id: 18, category: "음료", name: "복숭아 아이스티", image: "", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 19, category: "음료", name: "매실 아이스티", image: "", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
   { id: 20, category: "음료", name: "페퍼민트", image: "", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
   { id: 21, category: "음료", name: "캐모마일", image: "", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
 ];
@@ -345,13 +345,13 @@ export default function Home() {
             </div>
           ) : (
             <div className="space-y-3">
-              {orders.map((order) => (
+              {orders.map((order, orderIdx) => (
                 <div key={order.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-                  {/* 주문 헤더 */}
+                  {/* 주문 헤더: 번호는 현재 순서 기준 (서빙완료 시 재정렬) */}
                   <div className="flex items-center justify-between px-3 py-2 bg-amber-50 border-b border-amber-200">
                     <div className="flex items-center gap-2">
                       <span className="bg-amber-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
-                        #{order.id}
+                        #{orderIdx + 1}
                       </span>
                       <span className="text-[11px] text-gray-500">{order.time}</span>
                     </div>
