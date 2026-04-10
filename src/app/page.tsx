@@ -29,9 +29,10 @@ interface OrderItem {
 // 주문 내역
 interface Order {
   id: number;
+  orderType: "매장" | "포장"; // 매장주문 / 포장주문
   items: OrderItem[];
   total: number;
-  time: string; // 주문 시각
+  time: string;
 }
 
 // ──────────────────────────────────────────────
@@ -52,15 +53,16 @@ const initialMenuData: MenuItem[] = [
   { id: 11, category: "디저트", name: "말차 마카다미아 르뱅쿠키", image: "/menu/matcha-macadamia-levain.png", price: 5000, hotQty: 0, iceQty: 0, hasTempOption: false },
   { id: 12, category: "디저트", name: "아몬드 청키초코 르뱅쿠키", image: "/menu/almond-chunky-levain.png", price: 5000, hotQty: 0, iceQty: 0, hasTempOption: false },
   { id: 13, category: "디저트", name: "두바이 쫀득쿠키", image: "/menu/dubai-cookie.png", price: 5500, hotQty: 0, iceQty: 0, hasTempOption: false },
+  { id: 14, category: "디저트", name: "버터떡 5ea", image: "/menu/butter-tteok.png", price: 5000, hotQty: 0, iceQty: 0, hasTempOption: false },
   // 음료 (Hot/Ice 선택 가능)
-  { id: 14, category: "음료", name: "아메리카노", image: "/menu/americano.png", price: 3800, hotQty: 0, iceQty: 0, hasTempOption: true },
-  { id: 15, category: "음료", name: "카페라떼", image: "/menu/cafe-latte.png", price: 4500, hotQty: 0, iceQty: 0, hasTempOption: true },
-  { id: 16, category: "음료", name: "무설탕 초코라떼", image: "/menu/choco-latte.png", price: 5000, hotQty: 0, iceQty: 0, hasTempOption: true },
-  { id: 17, category: "음료", name: "말차라떼", image: "/menu/matcha-latte.png", price: 5000, hotQty: 0, iceQty: 0, hasTempOption: true },
-  { id: 18, category: "음료", name: "복숭아 아이스티", image: "/menu/peach-icetea.png", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
-  { id: 19, category: "음료", name: "매실 아이스티", image: "/menu/plum-icetea.png", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
-  { id: 20, category: "음료", name: "페퍼민트", image: "/menu/peppermint.png", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
-  { id: 21, category: "음료", name: "캐모마일", image: "/menu/chamomile.png", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 15, category: "음료", name: "아메리카노", image: "/menu/americano.png", price: 3800, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 16, category: "음료", name: "카페라떼", image: "/menu/cafe-latte.png", price: 4500, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 17, category: "음료", name: "무설탕 초코라떼", image: "/menu/choco-latte.png", price: 5000, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 18, category: "음료", name: "말차라떼", image: "/menu/matcha-latte.png", price: 5000, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 19, category: "음료", name: "복숭아 아이스티", image: "/menu/peach-icetea.png", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 20, category: "음료", name: "매실 아이스티", image: "/menu/plum-icetea.png", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 21, category: "음료", name: "페퍼민트", image: "/menu/peppermint.png", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
+  { id: 22, category: "음료", name: "캐모마일", image: "/menu/chamomile.png", price: 4000, hotQty: 0, iceQty: 0, hasTempOption: true },
 ];
 
 // ──────────────────────────────────────────────
@@ -117,7 +119,7 @@ export default function Home() {
 
   // ── 주문 완료 ──
 
-  const handleOrderComplete = () => {
+  const handleOrderComplete = (orderType: "매장" | "포장") => {
     const orderItems: OrderItem[] = [];
     menuItems.forEach((item) => {
       const totalQty = item.hotQty + item.iceQty;
@@ -143,11 +145,14 @@ export default function Home() {
     const now = new Date();
     const time = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
 
-    setOrders((prev) => [...prev, { id: nextOrderId, items: orderItems, total, time }]);
+    setOrders((prev) => [...prev, { id: nextOrderId, orderType, items: orderItems, total, time }]);
     setNextOrderId((prev) => prev + 1);
 
     // 수량 초기화
     setMenuItems((prev) => prev.map((item) => ({ ...item, hotQty: 0, iceQty: 0 })));
+
+    // 주문내역 탭으로 이동
+    scrollToPage(2);
   };
 
   // ── 주문 삭제 (서빙 완료) ──
@@ -202,17 +207,30 @@ export default function Home() {
       {/* ── 헤더 ── */}
       <header className="flex-shrink-0 bg-white border-b border-gray-200 px-4 py-2.5 flex items-center justify-between">
         <h1 className="text-base font-bold text-gray-900">☕ 카페 메뉴 정산</h1>
-        <button
-          onClick={handleOrderComplete}
-          disabled={totalQuantity === 0}
-          className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors ${
-            totalQuantity > 0
-              ? "bg-amber-500 text-white active:bg-amber-600"
-              : "bg-gray-200 text-gray-400"
-          }`}
-        >
-          주문완료 {totalQuantity > 0 && `(${totalQuantity})`}
-        </button>
+        <div className="flex gap-1.5">
+          <button
+            onClick={() => handleOrderComplete("매장")}
+            disabled={totalQuantity === 0}
+            className={`px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-colors ${
+              totalQuantity > 0
+                ? "bg-amber-500 text-white active:bg-amber-600"
+                : "bg-gray-200 text-gray-400"
+            }`}
+          >
+            매장 {totalQuantity > 0 && `(${totalQuantity})`}
+          </button>
+          <button
+            onClick={() => handleOrderComplete("포장")}
+            disabled={totalQuantity === 0}
+            className={`px-2.5 py-1.5 text-[11px] font-bold rounded-lg transition-colors ${
+              totalQuantity > 0
+                ? "bg-emerald-500 text-white active:bg-emerald-600"
+                : "bg-gray-200 text-gray-400"
+            }`}
+          >
+            포장 {totalQuantity > 0 && `(${totalQuantity})`}
+          </button>
+        </div>
       </header>
 
       {/* ── 탭 네비게이션 (3개) ── */}
@@ -349,9 +367,16 @@ export default function Home() {
                 <div key={order.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                   {/* 주문 헤더: 번호는 현재 순서 기준 (서빙완료 시 재정렬) */}
                   <div className="flex items-center justify-between px-3 py-2 bg-amber-50 border-b border-amber-200">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5">
                       <span className="bg-amber-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
                         #{orderIdx + 1}
+                      </span>
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                        order.orderType === "매장"
+                          ? "bg-amber-100 text-amber-700"
+                          : "bg-emerald-100 text-emerald-700"
+                      }`}>
+                        {order.orderType === "매장" ? "매장" : "포장"}
                       </span>
                       <span className="text-[11px] text-gray-500">{order.time}</span>
                     </div>
