@@ -7,9 +7,9 @@ import { useState, useRef, useCallback, useEffect } from "react";
 // ──────────────────────────────────────────────
 interface MenuItem {
   id: number;
-  category: "디저트" | "음료" | "티";
+  category: "디저트" | "음료";
   name: string;
-  image: string; // 이미지 경로 (빈 문자열이면 플레이스홀더)
+  image: string;
   price: number;
   quantity: number;
 }
@@ -34,43 +34,38 @@ const initialMenuData: MenuItem[] = [
   { id: 13, category: "디저트", name: "두바이 쫀득쿠키", image: "/menu/dubai-cookie.png", price: 5500, quantity: 0 },
   // 음료 메뉴
   { id: 14, category: "음료", name: "아메리카노", image: "", price: 3800, quantity: 0 },
-  { id: 15, category: "음료", name: "카페라떼", image: "", price: 4000, quantity: 0 },
+  { id: 15, category: "음료", name: "카페라떼", image: "", price: 4500, quantity: 0 },
   { id: 16, category: "음료", name: "무설탕 초코라떼", image: "", price: 5000, quantity: 0 },
   { id: 17, category: "음료", name: "말차라떼", image: "", price: 5000, quantity: 0 },
-  { id: 18, category: "음료", name: "아이스티", image: "", price: 4500, quantity: 0 },
-  // 티 메뉴
-  { id: 19, category: "티", name: "페퍼민트", image: "", price: 5000, quantity: 0 },
-  { id: 20, category: "티", name: "캐모마일", image: "", price: 5000, quantity: 0 },
+  { id: 18, category: "음료", name: "복숭아 아이스티", image: "", price: 4000, quantity: 0 },
+  { id: 19, category: "음료", name: "매실 아이스티", image: "", price: 4000, quantity: 0 },
+  { id: 20, category: "음료", name: "페퍼민트", image: "", price: 4000, quantity: 0 },
+  { id: 21, category: "음료", name: "캐모마일", image: "", price: 4000, quantity: 0 },
 ];
 
 // ──────────────────────────────────────────────
-// 카테고리 설정
+// 카테고리 설정 (2개 탭)
 // ──────────────────────────────────────────────
-const categories = ["디저트", "음료", "티"] as const;
+const categories = ["디저트", "음료"] as const;
 const categoryEmoji: Record<string, string> = {
   "디저트": "🍰",
   "음료": "☕",
-  "티": "🍵",
 };
 
 // ──────────────────────────────────────────────
 // 유틸 함수
 // ──────────────────────────────────────────────
-
-// 원화 형식 변환 (예: 4500 → "4,500")
 function formatWon(amount: number): string {
   const safe = Number.isFinite(amount) ? amount : 0;
   return safe.toLocaleString("ko-KR");
 }
 
-// 안전한 정수 파싱 (음수, NaN 방지)
 function safeParseInt(value: string): number {
   const parsed = parseInt(value, 10);
   if (Number.isNaN(parsed) || parsed < 0) return 0;
   return parsed;
 }
 
-// 안전한 금액 파싱
 function safeParsePrice(value: string): number {
   const parsed = parseInt(value, 10);
   if (Number.isNaN(parsed) || parsed < 0) return 0;
@@ -83,7 +78,6 @@ function safeParsePrice(value: string): number {
 export default function Home() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>(initialMenuData);
   const [activePage, setActivePage] = useState(0);
-  // 금액 편집 중인 메뉴 id (null이면 편집 안 함)
   const [editingPriceId, setEditingPriceId] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -99,14 +93,6 @@ export default function Home() {
     );
   };
 
-  const handleQuantityChange = (id: number, value: string) => {
-    setMenuItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, quantity: safeParseInt(value) } : item
-      )
-    );
-  };
-
   const handlePriceChange = (id: number, value: string) => {
     setMenuItems((prev) =>
       prev.map((item) =>
@@ -119,7 +105,7 @@ export default function Home() {
     setMenuItems(initialMenuData.map((item) => ({ ...item, quantity: 0 })));
   };
 
-  // ── 스와이프 페이지 감지 ──
+  // ── 스와이프 ──
 
   const handleScroll = useCallback(() => {
     if (!scrollRef.current) return;
@@ -130,7 +116,6 @@ export default function Home() {
     }
   }, [activePage]);
 
-  // 탭 클릭 시 해당 페이지로 스크롤
   const scrollToPage = (index: number) => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollTo({
@@ -139,7 +124,6 @@ export default function Home() {
     });
   };
 
-  // 윈도우 리사이즈 시 현재 페이지 위치 보정
   useEffect(() => {
     const handleResize = () => {
       if (!scrollRef.current) return;
@@ -160,9 +144,11 @@ export default function Home() {
   }, 0);
 
   const totalQuantity = menuItems.reduce((s, i) => s + (i.quantity || 0), 0);
-  const totalMenuCount = menuItems.filter((i) => i.quantity > 0).length;
 
-  // 카테고리별 소계 계산
+  // 선택된 메뉴 목록
+  const selectedItems = menuItems.filter((i) => i.quantity > 0);
+
+  // 카테고리별 소계
   const categoryTotals = categories.map((cat) =>
     menuItems
       .filter((i) => i.category === cat)
@@ -185,7 +171,7 @@ export default function Home() {
         </button>
       </header>
 
-      {/* ── 탭 네비게이션 ── */}
+      {/* ── 탭 네비게이션 (2개) ── */}
       <nav className="flex-shrink-0 bg-white border-b border-gray-200 flex">
         {categories.map((cat, idx) => (
           <button
@@ -200,13 +186,11 @@ export default function Home() {
             <span className="text-sm">
               {categoryEmoji[cat]} {cat}
             </span>
-            {/* 카테고리 소계 */}
             {categoryTotals[idx] > 0 && (
               <span className="block text-[10px] text-amber-500 font-semibold">
                 {formatWon(categoryTotals[idx])}원
               </span>
             )}
-            {/* 활성 탭 인디케이터 */}
             {activePage === idx && (
               <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-amber-500 rounded-full" />
             )}
@@ -230,7 +214,6 @@ export default function Home() {
               className="min-w-full w-full overflow-y-auto px-2 py-2"
               style={{ scrollSnapAlign: "start" }}
             >
-              {/* 메뉴 리스트 */}
               <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 {items.map((item, idx) => {
                   const itemTotal = (item.price || 0) * (item.quantity || 0);
@@ -241,61 +224,61 @@ export default function Home() {
                   return (
                     <div
                       key={item.id}
-                      className={`flex items-center px-2 py-[5px] gap-1.5 ${
+                      className={`flex items-center px-2.5 py-[6px] gap-2 ${
                         idx < items.length - 1 ? "border-b border-gray-100" : ""
                       } ${isActive ? "bg-amber-50/60" : ""}`}
                     >
-                      {/* 이미지 (원본 비율 유지, 작게 표시) */}
+                      {/* 이미지 */}
                       {item.image ? (
                         <img
                           src={item.image}
                           alt={item.name}
-                          className="w-8 h-8 rounded object-contain flex-shrink-0"
+                          className="w-9 h-9 rounded object-contain flex-shrink-0"
                         />
                       ) : (
-                        <span className="w-8 h-8 rounded bg-gray-100 flex items-center justify-center flex-shrink-0 text-xs">
-                          {category === "디저트" ? "🍰" : category === "음료" ? "☕" : "🍵"}
+                        <span className="w-9 h-9 rounded bg-gray-100 flex items-center justify-center flex-shrink-0 text-sm">
+                          {categoryEmoji[category]}
                         </span>
                       )}
-                      {/* 메뉴명 + 가격 (한 줄) */}
+                      {/* 메뉴명 + 가격 */}
                       <div className="flex-1 min-w-0"
                         onClick={() => setEditingPriceId(editingPriceId === item.id ? null : item.id)}
                       >
                         {isEditing ? (
                           <>
-                            <p className="text-[12px] font-medium text-gray-700 truncate leading-tight">{item.name}</p>
+                            <p className="text-[13px] font-medium text-gray-700 truncate">{item.name}</p>
                             <input
                               type="number" min="0" autoFocus
                               value={item.price}
                               onChange={(e) => handlePriceChange(item.id, e.target.value)}
                               onBlur={() => setEditingPriceId(null)}
                               onKeyDown={(e) => { if (e.key === "Enter") setEditingPriceId(null); }}
-                              className="w-16 text-[10px] text-gray-500 border border-amber-300 rounded px-1 focus:outline-none"
+                              className="w-16 text-[11px] text-gray-500 border border-amber-300 rounded px-1 mt-0.5 focus:outline-none"
                               onClick={(e) => e.stopPropagation()}
                             />
                           </>
                         ) : (
-                          <p className={`text-[12px] leading-tight truncate ${
+                          <p className={`text-[13px] leading-snug truncate ${
                             isActive ? "font-semibold text-gray-900" : "font-medium text-gray-700"
                           }`}>
-                            {item.name} <span className="text-[10px] text-gray-400 font-normal">{formatWon(item.price)}</span>
+                            {item.name} <span className="text-[11px] text-gray-400 font-normal">{formatWon(item.price)}</span>
                           </p>
                         )}
                       </div>
                       {/* 수량 */}
-                      <div className="flex items-center gap-0.5 flex-shrink-0">
+                      <div className="flex items-center gap-1 flex-shrink-0">
                         <button
                           onClick={() => handleQuantityStep(item.id, -1)}
-                          className="w-[22px] h-[22px] flex items-center justify-center rounded-full bg-gray-100 text-gray-500 text-xs font-bold active:bg-gray-200"
+                          className="w-6 h-6 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 text-xs font-bold active:bg-gray-200"
                         >-</button>
-                        <span className="w-5 text-center text-[12px] font-semibold">{item.quantity}</span>
+                        <span className="w-5 text-center text-[13px] font-semibold">{item.quantity}</span>
                         <button
                           onClick={() => handleQuantityStep(item.id, 1)}
-                          className="w-[22px] h-[22px] flex items-center justify-center rounded-full bg-amber-500 text-white text-xs font-bold active:bg-amber-600"
+                          className="w-6 h-6 flex items-center justify-center rounded-full bg-amber-500 text-white text-xs font-bold active:bg-amber-600"
                         >+</button>
                       </div>
                       {/* 합계 */}
-                      <span className={`w-12 text-right text-[11px] font-bold flex-shrink-0 ${
+                      <span className={`w-14 text-right text-[12px] font-bold flex-shrink-0 ${
                         safeTotal > 0 ? "text-amber-600" : "text-gray-200"
                       }`}>
                         {safeTotal > 0 ? formatWon(safeTotal) : "-"}
@@ -305,7 +288,6 @@ export default function Home() {
                 })}
               </div>
 
-              {/* 카테고리 소계 */}
               {categoryTotals[pageIdx] > 0 && (
                 <div className="mt-2 px-3 py-2 bg-amber-50 rounded-lg flex justify-between items-center">
                   <span className="text-xs text-amber-700 font-medium">{category} 소계</span>
@@ -319,19 +301,33 @@ export default function Home() {
         })}
       </main>
 
-      {/* ── 하단 전체 총합 (고정) ── */}
-      <footer className="flex-shrink-0 bg-white border-t-2 border-amber-400 px-4 py-3 flex items-center justify-between">
-        <div>
-          <p className="text-xs text-gray-500">전체 총합</p>
-          <p className="text-[10px] text-gray-400">
-            {totalMenuCount}종 / {totalQuantity}개
+      {/* ── 하단: 선택 메뉴 + 총합 ── */}
+      <footer className="flex-shrink-0 bg-white border-t-2 border-amber-400 px-3 py-2">
+        {/* 선택된 메뉴 목록 */}
+        {selectedItems.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-1.5 max-h-[52px] overflow-y-auto">
+            {selectedItems.map((item) => (
+              <span
+                key={item.id}
+                className="inline-flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-50 border border-amber-200 rounded text-[10px] text-amber-700"
+              >
+                {item.name}
+                <span className="font-bold">x{item.quantity}</span>
+              </span>
+            ))}
+          </div>
+        )}
+        {/* 총합 */}
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-gray-500">
+            전체 총합 <span className="text-gray-400">({selectedItems.length}종 / {totalQuantity}개)</span>
+          </p>
+          <p className={`text-xl font-extrabold ${
+            grandTotal > 0 ? "text-amber-600" : "text-gray-300"
+          }`}>
+            {formatWon(grandTotal)}원
           </p>
         </div>
-        <p className={`text-xl font-extrabold ${
-          grandTotal > 0 ? "text-amber-600" : "text-gray-300"
-        }`}>
-          {formatWon(grandTotal)}원
-        </p>
       </footer>
     </div>
   );
